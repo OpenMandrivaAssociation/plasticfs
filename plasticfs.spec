@@ -25,7 +25,6 @@ Patch1:		%{name}-1.8-dlsym-debug.patch.bz2
 Requires:	%{libname} = %{version}
 BuildRequires:  groff
 BuildRequires:  libtool
-BuildRoot:	%{_tmppath}/%{name}-root
 %description
 The Plastic File System is an LD_PRELOAD module for manipulating what
 the file system looks like for programs. This allows virtual file
