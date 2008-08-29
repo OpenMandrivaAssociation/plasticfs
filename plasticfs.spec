@@ -1,9 +1,6 @@
-%define name		plasticfs
-%define version		1.9
-%define release		%mkrel 4
-%define libmajor	0
-%define libname		%mklibname %{name} %{libmajor}
-%define libname_devel	%mklibname %{name} %{libmajor} -d
+%define major	0
+%define libname		%mklibname %{name} %{major}
+%define develname	%mklibname %{name} -d
 
 %define build_debug	0
 %define build_paranoid	0
@@ -12,20 +9,21 @@
 %{expand: %{?_with_paranoid: 	%%global build_paranoid 1}}
 %{expand: %{?_without_paranoid:	%%global build_paranoid 0}}
 
-Name:		%{name}
-Version:	%{version}
-Release:	%{release}
+Name:		plasticfs
+Version:	1.11
+Release:	%{mkrel 1}
 Summary:	An user-space virtual filesystem implementation
-License:	GPL
+License:	GPLv3+
 Group:		File tools
 URL:		http://plasticfs.sourceforge.net/
-Source0:	%{name}-%{version}.tar.bz2
-Patch0:		%{name}-1.8-non-paranoid.patch.bz2
-Patch1:		%{name}-1.8-dlsym-debug.patch.bz2
-Requires:	%{libname} = %{version}
+Source0:	http://plasticfs.sourceforge.net/%{name}-%{version}.tar.gz
+Patch0:		plasticfs-1.11-non-paranoid.patch
+Patch1:		plasticfs-1.11-dlsym-debug.patch
+Patch2:		plasticfs-1.11-makefile.patch
 BuildRequires:  groff
 BuildRequires:  libtool
 BuildRoot:	%{_tmppath}/%{name}-root
+
 %description
 The Plastic File System is an LD_PRELOAD module for manipulating what
 the file system looks like for programs. This allows virtual file
@@ -53,16 +51,19 @@ modules from shared object files.
 %package -n %{libname}
 Summary:	Libraries for the Plastic File System
 Group:		File tools
-%description -n %{libname}
-Libraries for the Plastic File System
 
-%package -n %{libname_devel}
+%description -n %{libname}
+Libraries for the Plastic File System.
+
+%package -n %{develname}
 Summary:	Development libraries for the Plastic File System
 Group:		Development/C
-Provides:	lib%{name}-devel
+Provides:	%{name}-devel
 Requires:	%{libname} = %{version}
-%description -n %{libname_devel}
-Development libraries for the Plastic File System
+Obsoletes:	%{mklibname plasticfs 0 -d}
+
+%description -n %{develname}
+Development libraries for the Plastic File System.
 
 %define _requires_exceptions libc.so.6(GLIBC_PRIVATE)
 
@@ -70,6 +71,8 @@ Development libraries for the Plastic File System
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
+
 %build
 EXTRA_FLAGS="-DNOT_IN_libc"
 %if !%{build_paranoid}
@@ -79,17 +82,17 @@ EXTRA_FLAGS="-DNOT_IN_libc"
 	EXTRA_FLAGS="$EXTRA_FLAGS -DVIEWPATH_DEBUG -DDLSYM_DEBUG -DFILTER_DEBUG"
 %endif
 %configure CXXFLAGS="$EXTRA_FLAGS"
-perl -pi -e 's/libtool/libtool --tag=cxx/' Makefile
+sed -i -e 's/libtool/libtool --tag=cxx/g' Makefile
 # (misc) here because we patch the makefile directly
 %make 
 
 %install
-rm -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}
 %makeinstall_std
 
 # convenience function
-mkdir -p $RPM_BUILD_ROOT%{_bindir}
-cat > $RPM_BUILD_ROOT%{_bindir}/plasticfs << EOF
+mkdir -p %{buildroot}%{_bindir}
+cat > %{buildroot}%{_bindir}/plasticfs << EOF
 #!/bin/sh
 if [ -z "\$1" ]; then
 	echo "USAGE: plasticfs <command>"
@@ -97,7 +100,7 @@ if [ -z "\$1" ]; then
 fi
 
 if [ -n "\$PLASTICFS" ]; then
-	LD_PRELOAD="%{_libdir}/libplasticfs.so.%{libmajor} \$LD_PRELOAD" \\
+	LD_PRELOAD="%{_libdir}/libplasticfs.so.%{major} \$LD_PRELOAD" \\
 	PLASTICFS="\$PLASTICFS" \\
 	\$@
 else
@@ -119,7 +122,7 @@ rm -Rf %{buildroot}
 
 %files
 %defattr(-,root,root)
-%doc BUILDING README LICENSE
+%doc BUILDING README
 %attr(755,root,root) %{_bindir}/plasticfs
 %{_mandir}/man1/plasticfs_license.1*
 %{_mandir}/man3/plasticfs.3*
@@ -136,12 +139,10 @@ rm -Rf %{buildroot}
 
 %files -n %{libname}
 %defattr(-,root,root)
-%{_libdir}/libplasticfs.so.%{libmajor}
-%{_libdir}/libplasticfs.so.%{libmajor}.0.0
+%{_libdir}/libplasticfs.so.%{major}*
 
-%files -n %{libname_devel}
+%files -n %{develname}
 %defattr(-,root,root)
-%{_libdir}/libplasticfs.a
-%{_libdir}/libplasticfs.la
+%{_libdir}/libplasticfs.*a
 %{_libdir}/libplasticfs.so
 
