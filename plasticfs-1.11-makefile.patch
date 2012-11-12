@@ -1,0 +1,9 @@
+--- plasticfs-1.11/Makefile.in	2007-11-27 14:11:21.000000000 -0800
++++ plasticfs-1.11/Makefile.in.new	2008-08-29 15:14:33.000000000 -0700
+@@ -1505,3 +1505,6 @@
+ 
+ $(libdir)/libplasticfs.la: lib/libplasticfs.la
+ 	mkdir -p $(libdir)
++	$(LIBTOOL) --mode=install $(INSTALL) lib/libplasticfs.la $@
++
++install: install-bin install-man install-lib

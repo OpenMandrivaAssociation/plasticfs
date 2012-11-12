@@ -1,0 +1,19 @@
+--- plasticfs-1.11/lib/plasticfs/dlsym_rtld_next.cc	2007-11-27 14:11:21.000000000 -0800
++++ plasticfs-1.11/lib/plasticfs/dlsym_rtld_next.cc.new	2008-08-29 14:59:55.000000000 -0700
+@@ -668,14 +668,14 @@
+     #ifdef DLSYM_DEBUG
+     error_message("%s: %d: getdirentriess64(fd = %d, buffer = %p, "
+         "nbytes = %ld, *base = %ld) {\n", __FILE__, __LINE__, fd, buffer,
+-        (long)nbytes, (long)*base);
++        (long)nbytes, (long)*base64);
+     #endif
+ #ifdef HAVE_GETDIRENTRIES64
+     FIND_SYMBOL(getdirentries64)
+     ssize_t result = getdirentries64_intercepted(fd, buffer, nbytes, base64);
+     #ifdef DLSYM_DEBUG
+     error_message("%s: %d: *base = %ld; return %ld }\n", __FILE__, __LINE__,
+-        (long)*base, (long)result);
++        (long)*base64, (long)result);
+     #endif
+     return result;
+ #else

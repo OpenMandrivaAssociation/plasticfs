@@ -1,0 +1,13 @@
+--- plasticfs-1.11/lib/plasticfs/parse.cc	2007-11-27 14:11:21.000000000 -0800
++++ plasticfs-1.11/lib/plasticfs/parse.cc.new	2008-08-29 14:58:12.000000000 -0700
+@@ -282,8 +282,10 @@
+     // Security paranoia: if this program is doing something interesting,
+     // show it the real file system, not the plastic one.
+     //
++    #ifndef NON_PARANOID
+     if (geteuid() == 0 || getuid() != geteuid() || getgid() != getegid())
+         return master;
++    #endif
+ 
+     //
+     // Read the PLASTICFS environment variable, and parse it into a
