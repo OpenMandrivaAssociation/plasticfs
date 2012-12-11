@@ -11,7 +11,7 @@
 
 Name:		plasticfs
 Version:	1.11
-Release:	%{mkrel 2}
+Release:	2
 Summary:	An user-space virtual filesystem implementation
 License:	GPLv3+
 Group:		File tools
@@ -22,7 +22,6 @@ Patch1:		plasticfs-1.11-dlsym-debug.patch
 Patch2:		plasticfs-1.11-makefile.patch
 BuildRequires:  groff
 BuildRequires:  libtool
-BuildRoot:	%{_tmppath}/%{name}-root
 
 %description
 The Plastic File System is an LD_PRELOAD module for manipulating what
@@ -65,7 +64,11 @@ Obsoletes:	%{mklibname plasticfs 0 -d}
 %description -n %{develname}
 Development libraries for the Plastic File System.
 
+%if %{_use_internal_dependency_generator}
+%define __noautoreq 'libc.so.6\\(GLIBC_PRIVATE\\)'
+%else
 %define _requires_exceptions libc.so.6(GLIBC_PRIVATE)
+%endif
 
 %prep
 %setup -q
@@ -110,16 +113,6 @@ else
 fi
 EOF
 
-%clean
-rm -Rf %{buildroot}
-
-%if %mdkversion < 200900
-%post -n %{libname} -p /sbin/ldconfig
-%endif
-%if %mdkversion < 200900
-%postun -n %{libname} -p /sbin/ldconfig
-%endif
-
 %files
 %defattr(-,root,root)
 %doc BUILDING README
@@ -143,6 +136,61 @@ rm -Rf %{buildroot}
 
 %files -n %{develname}
 %defattr(-,root,root)
-%{_libdir}/libplasticfs.*a
 %{_libdir}/libplasticfs.so
 
+
+
+%changelog
+* Sat Aug 30 2008 Adam Williamson <awilliamson@mandriva.com> 1.11-1mdv2009.0
++ Revision: 277516
+- simply file lists
+- don't package license
+- %%{buildroot} not $RPM_BUILD_ROOT
+- sed not perl
+- add some newlines to improve readability
+- add makefile.patch: restore lines apparently missing from end of makefile
+  that break installation
+- rediff non-paranoid.patch and dlsym-debug.patch
+- new license policy
+- new devel policy
+- drop unnecessary defines
+- new release 1.11
+
+  + Thierry Vignaud <tvignaud@mandriva.com>
+    - rebuild
+    - kill re-definition of %%buildroot on Pixel's request
+
+  + Pixel <pixel@mandriva.com>
+    - do not call ldconfig in %%post/%%postun, it is now handled by filetriggers
+
+  + Olivier Blin <oblin@mandriva.com>
+    - restore BuildRoot
+
+  + Guillaume Rousse <guillomovitch@mandriva.org>
+    - import plasticfs
+
+
+* Tue Apr 25 2006 Nicolas Lécureuil <neoclust@mandriva.org> 1.9-3mdk
+- Fix BuildRequires
+
+* Tue Dec 27 2005 Michael Scherer <misc@mandriva.org> 1.9-2mdk
+- Fix BuildRequires ( groff, for man pages )
+
+* Thu Nov 10 2005 Michael Scherer <misc@mandriva.org> 1.9-1mdk
+- new version 1.9
+- mkrel
+- rpmbuildupdate-aware
+- remove patch2, applied upstream
+
+* Wed Jun 30 2004 Michael Scherer <misc@mandrake.org> 1.8-2mdk 
+- rebuild for new gcc 
+- patch for new gcc and libtool ( patch 0 )
+ 
+* Fri Jan 16 2004 Jaco Greeff <jaco@mandrake.org> 1.8-1mdk
+- Version 1.8
+- Add --with debug & paranoid options
+- patch1: Fix compiler error with DLSYM_DEBUG defined
+
+* Wed Jan 14 2004 Jaco Greeff <jaco@mandrake.org> 1.7-1mdk
+- Initial MDK package, version 1.7
+- patch0: Allow execution as root user
