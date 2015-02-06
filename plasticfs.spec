@@ -11,7 +11,7 @@
 
 Name:		plasticfs
 Version:	1.11
-Release:	2
+Release:	3
 Summary:	An user-space virtual filesystem implementation
 License:	GPLv3+
 Group:		File tools
