@@ -15,7 +15,7 @@ Release:	3
 Summary:	An user-space virtual filesystem implementation
 License:	GPLv3+
 Group:		File tools
-URL:		http://plasticfs.sourceforge.net/
+URL:		https://plasticfs.sourceforge.net/
 Source0:	http://plasticfs.sourceforge.net/%{name}-%{version}.tar.gz
 Patch0:		plasticfs-1.11-non-paranoid.patch
 Patch1:		plasticfs-1.11-dlsym-debug.patch
